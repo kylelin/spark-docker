@@ -1,0 +1,19 @@
+FROM ypenglyn/spark:2.1.0
+
+####################
+# SETUP tools
+####################
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y curl vim openssh-server openssh-client && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /workspace/bin
+
+COPY conf/client-idle.sh /workspace/bin/client-idle.sh
+RUN chmod 777 /workspace/bin/client-idle.sh
+
+ENV PYTHON $PATH:/workspace/bin
+
+ENTRYPOINT /workspace/bin/client-idle.sh
+
+WORKDIR /workspace/
