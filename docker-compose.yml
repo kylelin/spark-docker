@@ -44,7 +44,9 @@ sparkslave:
         - sparkmaster:spark-master
 
 client:
-    image: ypenglyn/env:0.0.1
+    image: ypenglyn/env:0.0.2
+    ports:
+        - 9090:9090
     links:
         - namenode:hdfs-namenode
         - sparkmaster:spark-master

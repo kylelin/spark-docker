@@ -4,16 +4,31 @@ FROM ypenglyn/spark:2.1.0
 # SETUP tools
 ####################
 
+ENV ZEPPELIN_VERSION 0.7.1
+ENV ZEPPELIN_HOME /usr/local/zeppelin
+
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y curl vim openssh-server openssh-client && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /workspace/bin
+    mkdir -p /workspace/bin && \
+    curl -O http://www-us.apache.org/dist/zeppelin/zeppelin-$ZEPPELIN_VERSION/zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz && \
+    tar -zxf /zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz && \
+    rm /zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz && \
+    mv zeppelin-$ZEPPELIN_VERSION-bin-netinst /usr/local/zeppelin && \
+    mkdir -p /usr/local/zeppelin/logs
 
+RUN mkdir -p /usr/local/zeppelin/run
+
+COPY conf/zeppelin-env.sh $ZEPPELIN_HOME/conf/zeppelin-env.sh
+COPY conf/zeppelin-site.xml $ZEPPELIN_HOME/conf/zeppelin-site.xml
+COPY conf/shiro.ini $ZEPPELIN_HOME/conf/shiro.ini
 COPY conf/client-idle.sh /workspace/bin/client-idle.sh
 RUN chmod 777 /workspace/bin/client-idle.sh
 
-ENV PYTHON $PATH:/workspace/bin
+ENV PATH $PATH:/workspace/bin:$ZEPPELIN_HOME/bin
 
 ENTRYPOINT /workspace/bin/client-idle.sh
+
+EXPOSE 9090
 
 WORKDIR /workspace/
